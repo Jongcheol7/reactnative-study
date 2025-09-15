@@ -1,3 +1,4 @@
+import { useNavigation } from "@react-navigation/native";
 import {
   Image,
   Pressable,
@@ -8,17 +9,29 @@ import {
 } from "react-native";
 
 export default function MealItem({
+  id,
   title,
   imageUrl,
   duration,
   complexity,
   affordability,
 }) {
+  // 사실 얘도 카테고리처럼 네비게이션에 등록된 컴포넌트에서 화면이동을 진행해야하지만
+  // useNavigation 을 활용하면 여기서도 화면이동 가능하다.
+  const navigation = useNavigation();
+
+  const selectsMealItemHandler = () => {
+    navigation.navigate("MealDetail", {
+      mealId: id,
+    });
+  };
+
   return (
     <View style={styles.mealItem}>
       <Pressable
         android_ripple={{ color: "#ccc" }}
         style={({ pressed }) => [pressed ? styles.buttonPressed : null]}
+        onPress={selectsMealItemHandler}
       >
         <View>
           {/* require는 로컬데이터 보여줄때? */}
