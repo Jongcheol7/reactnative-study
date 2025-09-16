@@ -1,24 +1,72 @@
-import { Image, Text, View } from "react-native";
+import {
+  Button,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { MEALS } from "../data/dummy-data";
 import MealDetails from "../components/MealDetails";
+import Subtitle from "../components/MealDetail/Subtitle";
+import List from "../components/MealDetail/List";
+import { useLayoutEffect } from "react";
+import IconButton from "../components/IconButton";
 
 export default function MealDetailScreen({ route, navigation }) {
   const mealId = route.params.mealId;
   const selectedMeal = MEALS.find((meal) => meal.id === mealId);
 
+  const headerButtonPressHandler = () => {
+    console.log("Pressed!");
+  };
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => {
+        // return <Button title="Tap me" onPress={headerButtonPressHandler} />;
+        return (
+          <IconButton
+            onPress={headerButtonPressHandler}
+            icon={"star"}
+            color={"white"}
+          />
+        );
+      },
+    });
+  }, [navigation, headerButtonPressHandler]);
+
   return (
-    <View>
-      <Image source={{ uri: selectedMeal.imageUrl }} />
-      <Text>{selectedMeal.title}</Text>
-      <MealDetails meal={selectedMeal} />
-      <Text>Ingredients</Text>
-      {selectedMeal.ingredients.map((ingredient) => (
-        <Text key={ingredient}>{ingredient}</Text>
-      ))}
-      <Text>Steps</Text>
-      {selectedMeal.ingredients.map((step) => (
-        <Text key={step}>{step}</Text>
-      ))}
-    </View>
+    <ScrollView style={styles.rootContainer}>
+      <Image style={styles.image} source={{ uri: selectedMeal.imageUrl }} />
+      <Text style={styles.title}>{selectedMeal.title}</Text>
+      <MealDetails meal={selectedMeal} textStyle={styles.detailText} />
+
+      <Subtitle title={"Ingredients"} />
+      <List data={selectedMeal.ingredients} />
+
+      <Subtitle title={"Steps"} />
+      <List data={selectedMeal.steps} />
+    </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  rootContainer: {
+    marginBottom: 32,
+  },
+  image: {
+    width: "100%",
+    height: 350,
+  },
+  title: {
+    fontWeight: "bold",
+    fontSize: 24,
+    margin: 8,
+    textAlign: "center",
+    color: "white",
+  },
+  detailText: {
+    color: "white",
+  },
+});
