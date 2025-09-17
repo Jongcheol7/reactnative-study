@@ -1,7 +1,6 @@
-import { FlatList, StyleSheet, Text, View } from "react-native";
 import { CATEGORIES, MEALS } from "../data/dummy-data";
-import MealItem from "../components/MealItem";
-import { useEffect, useLayoutEffect } from "react";
+import { useLayoutEffect } from "react";
+import MealsList from "../components/MealsList/MealsList";
 
 export default function MealsOverviewScreen({ route, navigation }) {
   // navigation prop 뿐만 아니라 route 도 받을수 있다.
@@ -22,32 +21,5 @@ export default function MealsOverviewScreen({ route, navigation }) {
     });
   }, [catId, navigation]);
 
-  return (
-    <View style={styles.container}>
-      {/* <Text>Meals Overview Screen - {catId}</Text> */}
-      <FlatList
-        data={displayedMeals}
-        keyExtractor={(item) => item.id}
-        renderItem={(item) => {
-          return (
-            <MealItem
-              id={item.item.id}
-              title={item.item.title}
-              imageUrl={item.item.imageUrl}
-              duration={item.item.duration}
-              complexity={item.item.complexity}
-              affordability={item.item.affordability}
-            />
-          );
-        }}
-      />
-    </View>
-  );
+  return <MealsList items={displayedMeals} />;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-  },
-});
