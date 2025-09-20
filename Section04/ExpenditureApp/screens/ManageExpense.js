@@ -5,8 +5,11 @@ import { GlobalStyles } from "../constants/styles";
 import Button from "../components/ui/Button";
 import { ExpensesContext } from "../store/expenses-context";
 import { getFormattedDate } from "../util/date";
+import { deleteExpense, storeExpense, updateExpense } from "../util/http";
+import LoadingOverlay from "../components/ui/LoadingOverlay";
 
 export default function ManageExpense({ route, navigation }) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [inputValues, setInputValues] = useState({
     amount: "",
     date: "",
@@ -35,8 +38,11 @@ export default function ManageExpense({ route, navigation }) {
     }
   }, [navigation, isEditing]);
 
-  function deleteExpenseHandler() {
+  async function deleteExpenseHandler() {
+    setIsSubmitting(true);
     expensesCtx.deleteExpense(expenseId);
+    await deleteExpense(expenseId);
+    setIsSubmitting(false);
     navigation.goBack();
   }
 
@@ -44,7 +50,7 @@ export default function ManageExpense({ route, navigation }) {
     navigation.goBack();
   }
 
-  function confirmHandler() {
+  async function confirmHandler() {
     const expenseData = {
       amount: +inputValues.amount,
       date: new Date(inputValues.date),
@@ -63,8 +69,14 @@ export default function ManageExpense({ route, navigation }) {
 
     if (isEditing) {
       expensesCtx.updateExpense(expenseId, expenseData);
+      setIsSubmitting(true);
+      await updateExpense(expenseId, expenseData);
+      setIsSubmitting(false);
     } else {
-      expensesCtx.addExpense(expenseData);
+      setIsSubmitting(true);
+      const id = await storeExpense(expenseData);
+      setIsSubmitting(false);
+      expensesCtx.addExpense({ ...expenseData, id: id });
     }
     navigation.goBack();
   }
@@ -76,6 +88,10 @@ export default function ManageExpense({ route, navigation }) {
         [inputIdentifier]: enteredValue,
       };
     });
+  }
+
+  if (isSubmitting) {
+    return <LoadingOverlay />;
   }
 
   return (
